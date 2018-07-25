@@ -1,16 +1,14 @@
 import React, { Component } from 'react';
-import { Route, Switch, Redirect } from 'react-router-dom';
+import { Route, Switch, Redirect, Link } from 'react-router-dom';
 import './App.css';
 
 const fakeAuth = {
   isAuthenticated: false,
-  authenticate(cb) {
+  authenticate() {
     this.isAuthenticated = true;
-    setTimeout(cb, 100); // fake async
   },
-  signout(cb) {
+  logout() {
     this.isAuthenticated = false;
-    setTimeout(cb, 100); // fake async
   }
 };
 
@@ -19,17 +17,33 @@ const fakeAuth = {
 const Home = props => (
   <div>
     <h1>Welcome Home</h1>
+    <Link to="/login">Click Here to Login</Link>
   </div>
 );
 const About = props => (
   <h1>You already know everything about me you need to know... So go away </h1>
 );
 
-const Login = props => (
-  <div>
-    <h1>Login</h1>
-  </div>
-);
+class Login extends Component {
+  login = () => {
+    fakeAuth.authenticate();
+    this.props.history.push('/protected'); // forcing a route change
+  };
+  logout = () => {
+    fakeAuth.logout();
+    this.props.history.push('/'); // forcing a route change
+  };
+  render() {
+    return (
+      <div>
+        <h1>Login Page</h1>
+        <small>{`isAuthenticated: ${fakeAuth.isAuthenticated}`}</small>
+        <button onClick={this.login}>Login</button>
+        <button onClick={this.logout}>Logout</button>
+      </div>
+    );
+  }
+}
 
 const NotFound = props => (
   <h1>{`${props.location.pathname} is not a valid route for this app.`}</h1>
@@ -37,13 +51,31 @@ const NotFound = props => (
 
 // Our custom PrivateRoute component
 
-const PrivateRoute = props => {
-  if (fakeAuth.isAuthenticated) {
-    // go to props.component
-  } else {
-    // redirect back to /login
-  }
+/**
+ * THIS IS A HOC
+ *   from here -> https://tylermcginnis.com/react-router-protected-routes-authentication/
+ */
+const PrivateRoute = ({ component: Component, ...rest }) => {
+  return (
+    <Route
+      {...rest}
+      render={routeProps =>
+        fakeAuth.isAuthenticated === true ? (
+          <Component {...routeProps} />
+        ) : (
+          <Redirect to="/login" />
+        )
+      }
+    />
+  );
 };
+
+const Protected = props => (
+  <div>
+    <small>{`isAuthenticated: ${fakeAuth.isAuthenticated}`}</small>
+    <h1>This is a protected secret component.</h1>
+  </div>
+);
 
 // Main App
 
@@ -59,6 +91,7 @@ class App extends Component {
           {/* this is a 404 handler */}
           {/* <Route component={NotFound} /> */}
           <Route exact path="/login" component={Login} />
+          <PrivateRoute exact path="/protected" component={Protected} />
           {/* Below is a redirect back home; this has to be at the bottom as a catch-all */}
           <Redirect to="/" />
         </Switch>
