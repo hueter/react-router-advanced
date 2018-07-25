@@ -4,8 +4,7 @@ import './App.css';
 
 const Home = props => (
   <div>
-    {/* this nested route only exists if the "exact" prop is not placed on the Home route */}
-    {/* <Route path="/taco" component={props => <small>theres a taco</small>} /> */}
+    <h1>Welcome Home</h1>
   </div>
 );
 const About = props => (
@@ -20,13 +19,14 @@ class App extends Component {
     return (
       <div>
         <Switch>
-          <Route path="/" component={Home} />
+          {/* The exact prop is necessary for home so it doesn't match all the other paths */}
+          <Route exact path="/" component={Home} />
           {/* exact prop for /about is not necessary unless there are other /about/something routes */}
           <Route exact path="/about" component={About} />
           {/* this is a 404 handler */}
           {/* <Route component={NotFound} /> */}
 
-          {/* Below is a redirect back home */}
+          {/* Below is a redirect back home; this has to be at the bottom as a catch-all */}
           <Redirect to="/" />
         </Switch>
       </div>
