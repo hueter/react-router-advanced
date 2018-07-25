@@ -14,14 +14,49 @@ const fakeAuth = {
 
 // Different Routes
 
-const Home = props => (
-  <div>
-    <h1>Welcome Home</h1>
-    <Link to="/login">Click Here to Login</Link>
-  </div>
-);
+class Home extends Component {
+  logout = () => {
+    fakeAuth.logout();
+    this.props.history.push('/'); // forcing a route change
+  };
+
+  render() {
+    let loginOrLogout;
+
+    if (fakeAuth.isAuthenticated) {
+      loginOrLogout = <button onClick={this.logout}>Logout</button>;
+    } else if (!fakeAuth.isAuthenticated) {
+      loginOrLogout = (
+        <Link to="/login" style={{ textDecoration: 'none' }}>
+          <button>Click Here to Login</button>
+        </Link>
+      );
+    }
+
+    return (
+      <div>
+        <small>{`isAuthenticated: ${fakeAuth.isAuthenticated}`}</small>
+        <h1>Welcome Home</h1>
+        <Link to="/about" style={{ textDecoration: 'none' }}>
+          <button>About</button>
+        </Link>
+        {loginOrLogout}
+        <Link to="/protected" style={{ textDecoration: 'none' }}>
+          <button>Go to Protected Route (Auth Required)</button>
+        </Link>
+      </div>
+    );
+  }
+}
+
 const About = props => (
-  <h1>You already know everything about me you need to know... So go away </h1>
+  <div>
+    <small>{`isAuthenticated: ${fakeAuth.isAuthenticated}`}</small>
+    <h1>You already know everything about me you need to know... So go away</h1>
+    <Link to="/" style={{ textDecoration: 'none' }}>
+      <button>Go back home</button>
+    </Link>
+  </div>
 );
 
 class Login extends Component {
@@ -32,8 +67,8 @@ class Login extends Component {
   render() {
     return (
       <div>
-        <h1>Login Page</h1>
         <small>{`isAuthenticated: ${fakeAuth.isAuthenticated}`}</small>
+        <h1>Login Page</h1>
         <br />
         <button onClick={this.login}>Login</button>
       </div>
@@ -67,16 +102,14 @@ const PrivateRoute = ({ component: Component, ...rest }) => {
 };
 
 class Protected extends Component {
-  logout = () => {
-    fakeAuth.logout();
-    this.props.history.push('/'); // forcing a route change
-  };
   render() {
     return (
       <div>
         <small>{`isAuthenticated: ${fakeAuth.isAuthenticated}`}</small>
         <h1>This is a protected secret component.</h1>
-        <button onClick={this.logout}>Logout</button>
+        <Link to="/" style={{ textDecoration: 'none' }}>
+          <button>Go Back Home</button>
+        </Link>
       </div>
     );
   }
