@@ -29,17 +29,13 @@ class Login extends Component {
     fakeAuth.authenticate();
     this.props.history.push('/protected'); // forcing a route change
   };
-  logout = () => {
-    fakeAuth.logout();
-    this.props.history.push('/'); // forcing a route change
-  };
   render() {
     return (
       <div>
         <h1>Login Page</h1>
         <small>{`isAuthenticated: ${fakeAuth.isAuthenticated}`}</small>
+        <br />
         <button onClick={this.login}>Login</button>
-        <button onClick={this.logout}>Logout</button>
       </div>
     );
   }
@@ -70,12 +66,21 @@ const PrivateRoute = ({ component: Component, ...rest }) => {
   );
 };
 
-const Protected = props => (
-  <div>
-    <small>{`isAuthenticated: ${fakeAuth.isAuthenticated}`}</small>
-    <h1>This is a protected secret component.</h1>
-  </div>
-);
+class Protected extends Component {
+  logout = () => {
+    fakeAuth.logout();
+    this.props.history.push('/'); // forcing a route change
+  };
+  render() {
+    return (
+      <div>
+        <small>{`isAuthenticated: ${fakeAuth.isAuthenticated}`}</small>
+        <h1>This is a protected secret component.</h1>
+        <button onClick={this.logout}>Logout</button>
+      </div>
+    );
+  }
+}
 
 // Main App
 
